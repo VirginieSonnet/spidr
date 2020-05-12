@@ -27,8 +27,6 @@ library(FactoMineR)
 
 names <- as.matrix(read_csv("data/colnames.csv",col_names=FALSE))
 file <- read_tsv("data/combined_sampled_250im.csv", col_names = names)
-# file <- read_csv("data/combined_sampled_250im_rm_outliers.csv", col_names = TRUE)
-
 
 # 2. PCA ------------------------------------------------------------------
 
