@@ -4,17 +4,13 @@
 #  % Reproject images in the PCA space and assign cluster number %
 #  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-# This code reads the whole csv files chunks by chunks and reprojects and assigns a cluster
-# number to each image. 
+# This code reads the whole csv files chunks by chunks and reprojects each image. 
 # It uses the SVD matrix from the projection of the subsampled images to reproject 
-# all of the images in the morphological space. The k-nearest neighbor approaches is used 
-# to assign a cluster number based on the cluster number associated with the subsampled 
-# images through the kmeans.
+# all of the images in the morphological space. 
 
 # 1. Load the data 
-# 2. Define the function to apply on each chunk of the csv file (reprojection+knn)
-# 3. Run the reprojection and knn on each chunk 
-# 4. Compute the diversity indices 
+# 2. Define the function to apply on each chunk of the csv file (transformation+reprojection)
+# 3. Run the reprojection on each chunk 
 
 # Set-up ------------------------------------------------------------------
 
@@ -36,7 +32,6 @@ source("scripts/lib_functional_diversity.R") # multidimFD4: functional diversity
 source("scripts/morphological_diversity.R") # wrap-up around multidimFD4
 
 
-
 # 1. Load the data --------------------------------------------------------
 
 # Column names 
@@ -51,7 +46,7 @@ concentration <- read_csv("data/concentration.csv") %>%
 mincols <- as.matrix(read_tsv("data/mincols.csv",col_names=TRUE))
 
 # Variables you don't wish to transform 
-no_trans <- c("ecc", "extent", "tx.avg.contrast", "tx.avg.gray", "tx.entropy", "tx.smooth", "tx.3rd.mom", "mode.dist","kurt.dist","skew.dist","area.perim2","circ", "nb.blobs")
+no_trans <- c("ecc", "extent", "tx.contrast", "tx.gray", "tx.entropy", "tx.smooth", "tx.3rd.mom", "mode.dist","kurt.dist","skew.dist","area.perim2","circ", "nb.blobs")
 
 # BoxCox coefficients 
 coeffs <- read_csv("data/lambda.csv")
@@ -73,7 +68,7 @@ rm(coeffs, res.pca)
 
 
 
-# 2. Function -------------------------------------------------------------
+# 2. Function ------------------------------------------------------------------
 
 pca_morphs <- function(morpho.bcx,pos){
   
@@ -85,10 +80,15 @@ pca_morphs <- function(morpho.bcx,pos){
     left_join(concentration,by="date")
   row.w = poids$conc/sum(poids$conc)
   cat("Weights done.")
-
+  
+  # Keep important information 
+  imp <- select(morpho.bcx, id, roi_number, class_id)
+  
+  # make sure lambda has no values for the not transformed columns
+  lambda = lambda[!(names(lambda) %in% no_trans)]  
   
   # Transformation (BoxCox)
-  morpho.bcx <- pcatrans(morpho.bcx, rm_cols = c("id","filename","date","class_id"), 
+  morpho.bcx <- pcatrans(morpho.bcx, rm_cols = c("id","roi_number", "filename","date","class_id"), 
                    trans="boxcox",min_cols=mincols, no_trans = no_trans, lambda=lambda,
                    coeffs = FALSE)
   cat("Transformation done.")
@@ -98,34 +98,14 @@ pca_morphs <- function(morpho.bcx,pos){
   pca_coord <- scale(morpho.bcx,centre,ecart.type) %*% loadings
   cat("Reprojection done")
   
-  # Clustering: use knn to get th morpho group
-  morph_nb <- get.knnx(kmeans_centers, pca_coord, 1)$nn.index[,1]
-  
-  # Combine PCA coordinates and morpho groups 
-  kmeans <- cbind(poids, pca_coord, morph_nb)
+  pca_coord <- cbind(imp, poids, pca_coord)
 }
 
 
-# 3. Run reprojection and knn ---------------------------------------------------------
+# 3. Run reprojection ----------------------------------------------------------
 
 tic()
 full_data <- read_tsv_chunked("data/combined_cleaned.csv", DataFrameCallback$new(pca_morphs), chunk_size = 100000, col_names=names)
 toc()
 
-write_csv(full_data,"data/full_data_pca+kmeans.csv")
-
-
-# 4. Diversity indices  ---------------------------------------------------------------
-
-kmeans_centers <- read_csv("data/kmeans_centers.csv")
-
-# Morphological diversity 
-tic()
-fd <- morphological_diversity(full_data,kmeans_centers,verb=TRUE)
-toc()
-
-# Export as tibble 
-div <- as_tibble(fd) %>%
-  mutate(date = as.POSIXct(rownames(fd))) %>% 
-  left_join(concentration, by="date")
-write_csv(div,"data/full_data_diversity.csv")
+write_csv(full_data,"data/full_data_pca.csv")
