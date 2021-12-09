@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. -->
 
-# <img src="figures/spidr_logo.png" align="right" height="185.5"/> Subsampling of Plankton Imagery Datasets and Reprojection in a morphospace 
+# <img src="figures/spidr_logo.PNG" align="right" height="185.5"/> Subsampling of Plankton Imagery Datasets and Reprojection in a morphospace 
 
 <!-- badges: start -->
 
