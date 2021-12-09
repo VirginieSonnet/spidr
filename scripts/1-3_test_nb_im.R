@@ -5,8 +5,6 @@
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 # Input: 
-# - output files for each subsampling: combined_sampled{subsampling id}_{number of
-#                                      images sampled}im.csv
 # - combined results for each subsampling: subsp_results.csv
 
 # 1. Import the necessary files 
