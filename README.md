@@ -1,30 +1,45 @@
-# Subsampling of Plankton Imagery Datasets and Reprojection in a reduced space
+<!-- README.md is generated from README.Rmd. -->
 
-**** 
+# <img src="figures/spidr_logo.png" align="right" height="185.5"/> Subsampling of Plankton Imagery Datasets and Reprojection in a morphospace 
 
-This folder contains a worflow to process morphological features of plankton imagery in order to extract the main **morphological variations and diversity**. It includes a subsampling step that allows to deal with datasets too big to be opened in a programming software without (hopefully) losing too much resolution in the variations and diversity. 
+<!-- badges: start -->
 
-<br>
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT) [![R 4.1.1](https://img.shields.io/badge/R-4.1.1-red.svg)](https://www.r-project.org/) [![Bash](https://img.shields.io/badge/Bash-grey.svg)](https://www.gnu.org/software/bash/)
 
-### Analysis 
+<!-- badges: end -->
 
-The morphological analysis is based on **dimension reduction** (weighted-Principal Component Analysis), **clustering** (weighted K-means) and **functional diversity indices** as defined by Villéger et al. (2008). 
+This project presents a worflow to process morphological features of phytoplankton imagery in order to extract the main **morphological variations**. Although it was developped to analyze 110,000,000 images from an Imaging FlowCytobot(IFCB), the principles could be applicable to any plankton (or not!) imagery dataset. 
 
-The subsampling determines a number of images to subsample per sample date and a number of clusters, and perform the morphological analysis on the subsampled data. The full dataset is then **reprojected** into the PCA space using the SVD matrix and a cluster number is associated based on the **k-nearest neighbours** method. 
+You can find a detailed tutorial with an example illustrating this workflow using IFCB data here: https://virginiesonnet.github.io/spidr/
 
-<br>
+This repository and the MAPI repository (Morphological Analysis of Plankton Imagery) support the article *Size, width, shape regularity, and chains: time series analysis of phytoplankton morphology from imagery in Narragansett Bay* by Sonnet et al. (2022).
 
-### Material 
+## Overview
 
-**All the details and an example on an ImagingFlowCytobot dataset can be found in the HTML file `spidr.html`.** 
+The projection of every image in a morphospace requires 3 steps: 
 
-The scripts assume access to a database and the queries will have to be modified following the database structure. All the scripts and functions are in the `scripts/` folder except the file `lib_functional_diversity.R` that contains the function `multidimFD4` written by Sébastien Villéger and available at http://villeger.sebastien.free.fr/Rscripts.html.  
+1. Subsampling  an adequate number of images to avoid losing too much resolution in the variations but reduce the computing power
+2. Creating a morphospace with the subsampled images using a Principal Component Analsis (PCA)
+3. Reprojecting all images within that morphospace using the Singular Value Decomposition matrix (SVD) from the PCA  
 
-A very short subset of the dataset we used as an example is provided in the `data/` folder, along with the CSV files that come from the database if you wish to try running the scripts. 
 
-<br>
+## Pre-requisites 
 
-*Villéger, S., Mason, N. W. H., & Mouillot, D. (2008). New multidimensional diversity indices for a multifaceted framework in functional ecology. Ecology, 89(8), 2290–2301. https://doi.org/10.1890/07-1206.1*
+The scripts assume access to a database but could be modified depending on the storage method. 
+The queries will have to be modified following the database structure. 
+All the scripts and functions are in the `scripts/` folder.
+
+A very short subset of the dataset we used in the paper is provided as an example in the `data/` folder. The other CSV files are output examples or other data from the database needed for the different steps of the code (e.g.: concentration per sample, minimum per variable, etc). 
+
+
+## Development 
+
+The idea of a morphospace with PCA from plankton imagery come from  **Jean-Olivier Irisson** and **Sakina-Dorothee Ayata** (Laboratoire d'Oceanographie de Villefranche-sur-Mer, Sorbonne Universite). 
+
+The subsampling methodology to deal with large datasets and the code presented here were developped by **Virginie Sonnet** (Graduate School of Oceanography, University of Rhode Island). 
+
+
+
 
 
 
