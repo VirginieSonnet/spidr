@@ -7,12 +7,12 @@
 # Input: 
 # - output files for each subsampling: combined_sampled{subsampling id}_{number of
 #                                      images sampled}im.csv
+# - combined results for each subsampling: subsp_results.csv
 
 # 1. Import the necessary files 
 # 2. Run and extract information from the PCA on each file 
 # 3. Export to csv
 # 4. Graphs 
-# 5. Statistiques 
 
 
 # Set-up ------------------------------------------------------------------
@@ -185,16 +185,5 @@ counts %>%
        y = "Counts the variable appears in this position",
        color = "Variables")
 # ggsave("figures/counts_var.png")
-
-
-
-# 5. Statistiques ---------------------------------------------------------
-
-# Linear regressions for each PC component 
-for (ii in 1:6){
-  pc_lm <- filter(pc_res, pc==ii)
-  model <- lm(var ~ nb_im, data = pc_lm)
-  print(summary(model))
-}
 
 
